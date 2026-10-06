@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>今日心情小偵測</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:Arial,"Noto Sans TC",sans-serif;
+  background:linear-gradient(135deg,#f8f5ff,#eef8ff);
+  color:#333;min-height:100vh;display:flex;justify-content:center;
+  padding:40px 18px;
+}
+.card{
+  width:min(720px,100%);background:white;border-radius:24px;padding:32px;
+  box-shadow:0 12px 40px rgba(70,80,120,.12);
+}
+h1{text-align:center;margin:0 0 8px;font-size:32px}
+.subtitle{text-align:center;color:#777;margin-bottom:28px}
+label{font-weight:bold;display:block;margin-bottom:10px}
+textarea{
+  width:100%;height:180px;border:2px solid #e8e8f0;border-radius:16px;
+  padding:16px;font-size:16px;resize:vertical;outline:none;
+}
+textarea:focus{border-color:#8d7bea}
+button{
+  width:100%;margin-top:16px;border:0;border-radius:14px;padding:15px;
+  font-size:17px;font-weight:bold;background:#7c6ee6;color:white;cursor:pointer;
+}
+button:hover{opacity:.9}
+.result{display:none;margin-top:24px;padding:22px;border-radius:18px;background:#f7f6ff}
+.mood{font-size:26px;font-weight:bold;margin-bottom:10px}
+.bar{height:12px;background:#e8e8ef;border-radius:20px;overflow:hidden}
+.fill{height:100%;width:0;background:#7c6ee6;transition:.5s}
+.tip{margin-top:14px;line-height:1.7;color:#555}
+.examples{margin-top:22px;color:#666;font-size:14px;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>🌷 今日心情小偵測</h1>
+  <p class="subtitle">輸入一段文字，看看今天可能是哪種心情</p>
+
+  <label for="text">今天發生了什麼？</label>
+  <textarea id="text" placeholder="例如：今天報告終於完成了，超有成就感！"></textarea>
+  <button onclick="analyze()">開始分析</button>
+
+  <div class="result" id="result">
+    <div class="mood" id="mood"></div>
+    <div>情緒傾向</div>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+    <div class="tip" id="tip"></div>
+  </div>
+
+  <div class="examples">
+    <b>小提醒：</b>這個網站是課堂作品的簡易文字分析示範，
+    結果只代表關鍵字推測，不是心理或醫療診斷。
+  </div>
+</div>
+
+<script>
+function analyze(){
+  const text=document.getElementById("text").value.trim();
+  if(!text){alert("請先輸入一些文字！");return;}
+
+  const groups={
+    "開心":["開心","快樂","幸福","喜歡","期待","成功","好棒","哈哈","笑","開心死","超讚","開心！"],
+    "焦慮":["焦慮","緊張","擔心","害怕","壓力","煩","不安","來不及","怕","慌"],
+    "疲累":["累","疲累","疲倦","睡不著","熬夜","沒精神","好累","想睡","忙"],
+    "難過":["難過","傷心","失望","哭","寂寞","委屈","心情不好","難受"]
+  };
+
+  let scores={開心:0,焦慮:0,疲累:0,難過:0};
+  for(const mood in groups){
+    groups[mood].forEach(word=>{
+      if(text.includes(word)) scores[mood]++;
+    });
+  }
+
+  let best="平靜";
+  let max=0;
+  for(const mood in scores){
+    if(scores[mood]>max){max=scores[mood];best=mood;}
+  }
+
+  const data={
+    "開心":["😊 可能是「開心」","今天看起來有不少正向情緒！可以把讓你開心的事情記下來。"],
+    "焦慮":["😰 可能是「焦慮」","最近可能有一些事情讓你掛心，可以先把事情分成小步驟處理。"],
+    "疲累":["😴 可能是「疲累」","今天可能需要多休息一下，先完成最重要的事情就好。"],
+    "難過":["🥺 可能是「難過」","如果今天心情比較低落，可以找信任的人聊聊，也給自己一些休息時間。"],
+    "平靜":["😌 可能是「平靜」","目前沒有偵測到明顯的情緒關鍵字，看起來比較平穩。"]
+  };
+
+  const percent=max?Math.min(95,50+max*12):35;
+  document.getElementById("result").style.display="block";
+  document.getElementById("mood").textContent=data[best][0];
+  document.getElementById("fill").style.width=percent+"%";
+  document.getElementById("tip").textContent=data[best][1];
+}
+</script>
+</body>
+</html>
